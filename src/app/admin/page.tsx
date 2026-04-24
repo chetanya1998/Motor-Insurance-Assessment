@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import styles from './admin.module.css';
+import { Info, AlertTriangle, CheckCircle, Clock, Shield, Users, Activity, BarChart3, HelpCircle } from 'lucide-react';
+import Tooltip from '@/components/Tooltip';
 
 export default function AdminDashboard() {
   const [leads, setLeads] = useState<any[]>([]);
@@ -52,51 +54,68 @@ export default function AdminDashboard() {
         {/* Header */}
         <div className={styles.header}>
           <div>
-            <h1 className={styles.title}>Admin Dashboard</h1>
-            <p className={styles.subtitle}>Track funnel conversion and lead quality</p>
+            <h1 className={styles.title}>Admin Lead Center</h1>
+            <p className={styles.subtitle}>Monitor conversion funnel performance and lead quality scoring</p>
           </div>
-          <Link href="/" className={`btn btn-primary ${styles.headerBtn}`}>
-            ← Customer App
+          <Link href="/" className="btn btn-secondary btn-sm">
+            ← Back to Funnel
           </Link>
         </div>
 
         {/* Stats Grid */}
         <div className={styles.statsGrid}>
           <div className={styles.statCard}>
-            <p className={styles.statLabel}>Total Sessions</p>
-            <h2 className={styles.statValue}>{stats.totalSessions}</h2>
+            <div className={styles.statLabel}>
+              Total Visitors
+              <div className={styles.tooltipWrap}>
+                <Tooltip text="Unique user sessions started on the landing page." />
+              </div>
+            </div>
+            <h2 className={styles.statValue}><Users size={20} /> {stats.totalSessions}</h2>
           </div>
           <div className={styles.statCard}>
-            <p className={styles.statLabel}>Quotes Generated</p>
-            <h2 className={styles.statValue}>{stats.quotesGenerated}</h2>
+            <div className={styles.statLabel}>
+              Quotes Shown
+              <div className={styles.tooltipWrap}>
+                <Tooltip text="Users who successfully reached the estimate screen." />
+              </div>
+            </div>
+            <h2 className={styles.statValue}><BarChart3 size={20} /> {stats.quotesGenerated}</h2>
           </div>
           <div className={styles.statCard}>
-            <p className={styles.statLabel}>Applications</p>
-            <h2 className={styles.statValue}>{stats.applications}</h2>
+            <div className={styles.statLabel}>
+              Lead Quality
+              <div className={styles.tooltipWrap}>
+                <Tooltip text="Average score out of 100 based on user behavior and data validity." />
+              </div>
+            </div>
+            <h2 className={`${styles.statValue} ${styles.scorePrimary}`}><Activity size={20} /> {stats.avgScore}</h2>
           </div>
           <div className={styles.statCard}>
-            <p className={styles.statLabel}>Avg Lead Score</p>
-            <h2 className={`${styles.statValue} ${styles.scorePrimary}`}>{stats.avgScore}</h2>
+            <div className={styles.statLabel}>
+              Low Risk
+              <div className={styles.tooltipWrap}>
+                <Tooltip text="Leads with score > 80. High intent, valid data." />
+              </div>
+            </div>
+            <h2 className={`${styles.statValue} ${styles.scoreGood}`}><CheckCircle size={20} /> {stats.riskDistribution.low}</h2>
           </div>
           <div className={styles.statCard}>
-            <p className={styles.statLabel}>Low Risk</p>
-            <h2 className={`${styles.statValue} ${styles.scoreGood}`}>{stats.riskDistribution.low}</h2>
-          </div>
-          <div className={styles.statCard}>
-            <p className={styles.statLabel}>Medium Risk</p>
-            <h2 className={`${styles.statValue} ${styles.scoreMedium}`}>{stats.riskDistribution.medium}</h2>
-          </div>
-          <div className={styles.statCard}>
-            <p className={styles.statLabel}>High Risk</p>
-            <h2 className={`${styles.statValue} ${styles.scoreBad}`}>{stats.riskDistribution.high}</h2>
+            <div className={styles.statLabel}>
+              High Risk
+              <div className={styles.tooltipWrap}>
+                <Tooltip text="Leads with score < 50. Potential bots or low-intent users." />
+              </div>
+            </div>
+            <h2 className={`${styles.statValue} ${styles.scoreBad}`}><AlertTriangle size={20} /> {stats.riskDistribution.high}</h2>
           </div>
         </div>
 
         {/* Leads Section */}
         <div className={styles.section}>
           <div className={styles.sectionHeader}>
-            <h3 className={styles.sectionTitle}>Recent Leads</h3>
-            <span className={styles.badge}>{leads.length} total</span>
+            <h3 className={styles.sectionTitle}>Recent Conversion Activity</h3>
+            <span className={styles.badge}>{leads.length} Active Leads</span>
           </div>
 
           {/* Desktop Table */}
@@ -104,12 +123,12 @@ export default function AdminDashboard() {
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>Name / ID</th>
-                  <th>Vehicle</th>
-                  <th>Plan Selected</th>
-                  <th>Time</th>
-                  <th>Score</th>
-                  <th>Risk</th>
+                  <th>Customer Profile</th>
+                  <th>Vehicle Info</th>
+                  <th>Intent</th>
+                  <th>Time Taken</th>
+                  <th>Quality Score</th>
+                  <th>Status</th>
                   <th></th>
                 </tr>
               </thead>
@@ -117,7 +136,7 @@ export default function AdminDashboard() {
                 {leads.map((lead) => (
                   <tr key={lead.id} onClick={() => setSelectedLead(lead)} className={styles.tableRow}>
                     <td>
-                      <p className={styles.leadName}>{lead.personalDetails?.name || 'Anonymous'}</p>
+                      <p className={styles.leadName}>{lead.personalDetails?.name || 'In-Progress User'}</p>
                       <p className={styles.leadId}>{lead.id}</p>
                     </td>
                     <td>
@@ -125,59 +144,74 @@ export default function AdminDashboard() {
                       <p className={styles.leadId}>{lead.registrationNumber}</p>
                     </td>
                     <td>
-                      <p className={styles.vehicle}>{lead.selectedPlan?.insurer || '—'}</p>
+                      <p className={styles.vehicle}>{lead.selectedPlan?.insurer || 'Estimated Only'}</p>
                       <p className={styles.leadId}>{lead.selectedPlan ? `₹${lead.selectedPlan.price?.toLocaleString()}` : ''}</p>
                     </td>
-                    <td><span className={styles.vehicle}>{formatTime(lead.totalTimeMs)}</span></td>
+                    <td><span className={styles.vehicle}><Clock size={12} style={{ display: 'inline', marginRight: 4 }} />{formatTime(lead.totalTimeMs)}</span></td>
                     <td><span className={`${styles.scoreVal} ${getScoreClass(lead.score)}`}>{lead.score}</span></td>
                     <td><span className={`${styles.riskBadge} ${getRiskClass(lead.riskLevel)}`}>{lead.riskLevel}</span></td>
-                    <td><button className={styles.detailsBtn}>Details →</button></td>
+                    <td><button className={styles.detailsBtn}>Inspect →</button></td>
                   </tr>
                 ))}
                 {leads.length === 0 && (
                   <tr>
-                    <td colSpan={7} className={styles.emptyRow}>No leads yet. Complete the customer funnel first.</td>
+                    <td colSpan={7} className={styles.emptyRow}>No user activity detected yet.</td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
+        </div>
 
-          {/* Mobile Cards */}
-          <div className={styles.mobileCards}>
-            {leads.map((lead) => (
-              <div key={lead.id} className={styles.leadCard} onClick={() => setSelectedLead(lead)}>
-                <div className={styles.leadCardTop}>
-                  <div>
-                    <p className={styles.leadName}>{lead.personalDetails?.name || 'Anonymous'}</p>
-                    <p className={styles.leadId}>{lead.id}</p>
-                  </div>
-                  <span className={`${styles.riskBadge} ${getRiskClass(lead.riskLevel)}`}>{lead.riskLevel}</span>
-                </div>
-                <div className={styles.leadCardMeta}>
-                  <div className={styles.metaItem}>
-                    <span className={styles.metaLabel}>Vehicle</span>
-                    <span className={styles.metaValue}>{lead.vehicleDetails?.make} {lead.vehicleDetails?.model}</span>
-                  </div>
-                  <div className={styles.metaItem}>
-                    <span className={styles.metaLabel}>Plan</span>
-                    <span className={styles.metaValue}>{lead.selectedPlan?.insurer || '—'}</span>
-                  </div>
-                  <div className={styles.metaItem}>
-                    <span className={styles.metaLabel}>Score</span>
-                    <span className={`${styles.metaValue} ${getScoreClass(lead.score)}`}><strong>{lead.score}</strong></span>
-                  </div>
-                  <div className={styles.metaItem}>
-                    <span className={styles.metaLabel}>Time</span>
-                    <span className={styles.metaValue}>{formatTime(lead.totalTimeMs)}</span>
-                  </div>
-                </div>
-                <button className={styles.viewDetailsBtn}>View Details →</button>
-              </div>
-            ))}
-            {leads.length === 0 && (
-              <div className={styles.emptyMobile}>No leads yet. Complete the customer funnel first.</div>
-            )}
+        {/* Scoring Guide Section */}
+        <div className={styles.guideSection}>
+          <div className={styles.guideHeader}>
+            <h3 className={styles.guideTitle}><Shield size={20} style={{ display: 'inline', verticalAlign: '-3px', marginRight: 8, color: 'var(--primary)' }} /> Invisible Lead Scoring Logic</h3>
+            <p className={styles.guideSubtitle}>How we evaluate lead quality without bothering the user.</p>
+          </div>
+          
+          <table className={styles.guideTable}>
+            <thead>
+              <tr>
+                <th>Factor</th>
+                <th>Rule Description</th>
+                <th>Deduction</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Validation Errors</strong></td>
+                <td>User makes multiple mistakes while typing or enters invalid formats.</td>
+                <td className={styles.deduction}>-5 per error</td>
+              </tr>
+              <tr>
+                <td><strong>Completion Speed</strong></td>
+                <td>Funnel completed in under 25 seconds (indicates potential bot/automated filling).</td>
+                <td className={styles.deduction}>-25 points</td>
+              </tr>
+              <tr>
+                <td><strong>Disposable Email</strong></td>
+                <td>Using temporary email domains like tempmail.com or mailinator.com.</td>
+                <td className={styles.deduction}>-15 points</td>
+              </tr>
+              <tr>
+                <td><strong>Duplicate Data</strong></td>
+                <td>The same mobile number or vehicle number used across multiple sessions.</td>
+                <td className={styles.deduction}>-20 points</td>
+              </tr>
+              <tr>
+                <td><strong>Uncertainty</strong></td>
+                <td>Selecting "Not sure" for critical policy details like NCB.</td>
+                <td className={styles.deduction}>-10 points</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div className={styles.guideInfo}>
+            <Info size={16} />
+            <div>
+              <strong>Pro Tip:</strong> Focus on "Low Risk" leads (Score &gt; 80). These users spent enough time reading details and provided valid verified data, representing the highest conversion probability.
+            </div>
           </div>
         </div>
       </div>
@@ -188,73 +222,62 @@ export default function AdminDashboard() {
           <div className={styles.modal}>
             <div className={styles.modalHeader}>
               <div>
-                <h2 className={styles.modalTitle}>Lead: {selectedLead.id}</h2>
+                <h2 className={styles.modalTitle}>Lead Detail: {selectedLead.personalDetails?.name || selectedLead.id}</h2>
                 <span className={`${styles.riskBadge} ${getRiskClass(selectedLead.riskLevel)}`}>{selectedLead.riskLevel}</span>
               </div>
               <button className={styles.closeBtn} onClick={() => setSelectedLead(null)}>✕</button>
             </div>
 
             <div className={styles.modalGrid}>
-              {/* Left Column */}
               <div>
                 <div className={styles.infoSection}>
-                  <h4 className={styles.infoLabel}>Customer Info</h4>
+                  <h4 className={styles.infoLabel}>User Identity</h4>
                   <div className={styles.infoRow}><span>Name</span><strong>{selectedLead.personalDetails?.name || '—'}</strong></div>
                   <div className={styles.infoRow}><span>Mobile</span><strong>{selectedLead.personalDetails?.mobile || '—'}</strong></div>
                   <div className={styles.infoRow}><span>Email</span><strong className={styles.emailBreak}>{selectedLead.personalDetails?.email || '—'}</strong></div>
                 </div>
 
                 <div className={styles.infoSection}>
-                  <h4 className={styles.infoLabel}>Vehicle</h4>
-                  <div className={styles.infoRow}><span>Vehicle</span><strong>{selectedLead.vehicleDetails?.make} {selectedLead.vehicleDetails?.model}</strong></div>
-                  <div className={styles.infoRow}><span>Reg. No</span><strong>{selectedLead.registrationNumber}</strong></div>
-                  <div className={styles.infoRow}><span>Year</span><strong>{selectedLead.vehicleDetails?.manufactureYear}</strong></div>
-                  <div className={styles.infoRow}><span>City</span><strong>{selectedLead.vehicleDetails?.city}</strong></div>
-                </div>
-
-                <div className={styles.infoSection}>
-                  <h4 className={styles.infoLabel}>Policy Intent</h4>
-                  <div className={styles.infoRow}><span>Insurer</span><strong>{selectedLead.selectedPlan?.insurer || '—'}</strong></div>
-                  <div className={styles.infoRow}><span>Premium</span><strong>{selectedLead.selectedPlan ? `₹${selectedLead.selectedPlan.price?.toLocaleString()}` : '—'}</strong></div>
-                  <div className={styles.infoRow}><span>Add-ons</span><strong>{selectedLead.selectedAddons?.join(', ') || 'None'}</strong></div>
-                  <div className={styles.infoRow}><span>NCB</span><strong>{selectedLead.policyDetails?.ncb || '—'}</strong></div>
+                  <h4 className={styles.infoLabel}>Vehicle History</h4>
+                  <div className={styles.infoRow}><span>Make/Model</span><strong>{selectedLead.vehicleDetails?.make} {selectedLead.vehicleDetails?.model}</strong></div>
+                  <div className={styles.infoRow}><span>Registration</span><strong>{selectedLead.registrationNumber}</strong></div>
+                  <div className={styles.infoRow}><span>RTO Location</span><strong>{selectedLead.vehicleDetails?.city}</strong></div>
                 </div>
               </div>
 
-              {/* Right Column */}
               <div>
                 <div className={`${styles.scoreBox} ${selectedLead.score > 80 ? styles.scoreBoxGood : selectedLead.score > 50 ? styles.scoreBoxMed : styles.scoreBoxBad}`}>
-                  <h4 className={styles.infoLabel}>Lead Quality Score</h4>
+                  <h4 className={styles.infoLabel}>Lead Health Score</h4>
                   <div className={styles.scoreBig}>
                     <span className={getScoreClass(selectedLead.score)}>{selectedLead.score}</span>
-                    <span className={styles.scoreRisk}>/ 100 · {selectedLead.riskLevel}</span>
+                    <span className={styles.scoreRisk}>/ 100</span>
                   </div>
                   <ul className={styles.reasonsList}>
                     {selectedLead.reasons?.map((r: string, i: number) => (
                       <li key={i}><span>⚠</span> {r}</li>
                     ))}
                     {(!selectedLead.reasons || selectedLead.reasons.length === 0) && (
-                      <li className={styles.cleanProfile}><span>✓</span> Clean profile — no flags raised.</li>
+                      <li className={styles.cleanProfile}><span>✓</span> Validated behavior — high intent user.</li>
                     )}
                   </ul>
                 </div>
 
                 <div className={styles.infoSection}>
-                  <h4 className={styles.infoLabel}>Tracking</h4>
-                  <div className={styles.infoRow}><span>Completion Time</span><strong>{formatTime(selectedLead.totalTimeMs)}</strong></div>
-                  <div className={styles.infoRow}><span>Validation Errors</span><strong>{selectedLead.validationErrorCount || 0}</strong></div>
-                  <div className={styles.infoRow}><span>Submitted At</span><strong>{selectedLead.submittedAt ? new Date(selectedLead.submittedAt).toLocaleString() : '—'}</strong></div>
+                  <h4 className={styles.infoLabel}>Session Analytics</h4>
+                  <div className={styles.infoRow}><span>Funnel Time</span><strong>{formatTime(selectedLead.totalTimeMs)}</strong></div>
+                  <div className={styles.infoRow}><span>Field Errors</span><strong>{selectedLead.validationErrorCount || 0}</strong></div>
+                  <div className={styles.infoRow}><span>System IP/ID</span><strong>{selectedLead.id.split('-')[1]}</strong></div>
                 </div>
               </div>
             </div>
 
             <div className={styles.modalFooter}>
-              <button className={styles.closeModalBtn} onClick={() => setSelectedLead(null)}>Close</button>
+              <button className={styles.closeModalBtn} onClick={() => setSelectedLead(null)}>Close Inspector</button>
               <button
                 className={`btn ${selectedLead.riskLevel === 'High Risk' ? styles.investigateBtn : 'btn-primary'}`}
-                onClick={() => alert(selectedLead.riskLevel === 'High Risk' ? 'Lead flagged for investigation' : 'Lead assigned to agent')}
+                onClick={() => alert('Lead data exported to CRM')}
               >
-                {selectedLead.riskLevel === 'High Risk' ? '⚠ Investigate Lead' : 'Assign to Agent'}
+                {selectedLead.riskLevel === 'High Risk' ? 'Flag for Investigation' : 'Push to CRM'}
               </button>
             </div>
           </div>
