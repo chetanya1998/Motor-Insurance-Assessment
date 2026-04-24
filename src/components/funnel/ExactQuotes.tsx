@@ -11,66 +11,61 @@ export default function ExactQuotes({ onNext }: { onNext: () => void }) {
   const [quotes, setQuotes] = useState<any[]>([]);
 
   useEffect(() => {
-    const fetchExactQuotes = async () => {
+    const fetch = async () => {
       const res = await MockApi.getExactQuotes(lead.personalDetails, lead.policyDetails) as any[];
       setQuotes(res);
       updateLead({ exactQuotes: res });
       trackEvent('exact_quotes_viewed', res);
       setLoading(false);
     };
-    fetchExactQuotes();
+    fetch();
   }, []);
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <span className="loader mb-6"></span>
-        <h2>Fetching exact quotes...</h2>
-        <p className="text-muted">Negotiating best prices for you</p>
+      <div className="loading-state" style={{ minHeight: 300 }}>
+        <span className="loader" />
+        <div className="loading-text">Fetching exact quotes…</div>
+        <div className="loading-subtext">Negotiating best prices from insurers</div>
       </div>
     );
   }
 
-  const handleSelect = (quote: any) => {
-    updateLead({ selectedPlan: quote });
-    trackEvent('plan_selected', quote);
+  const handleSelect = (q: any) => {
+    updateLead({ selectedPlan: q });
+    trackEvent('plan_selected', q);
     onNext();
   };
 
   return (
-    <div className="flex flex-col h-full animate-fade-in">
-      <div className="mb-6">
-        <h2 className="mb-1">Exact quotes for you</h2>
-        <p className="text-sm text-muted">Prices are inclusive of GST</p>
+    <div>
+      <div style={{ marginBottom: 24 }}>
+        <h1 className="page-title">Your exact quotes</h1>
+        <p className="page-subtitle">Prices are inclusive of GST. Select a plan to continue.</p>
       </div>
 
-      <div className="space-y-4">
-        {quotes.map((q) => (
-          <div key={q.id} className="card relative overflow-hidden">
-            {q.coverType === 'Lowest price' && (
-                <div className="absolute top-0 right-0 bg-accent text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg uppercase">Best Value</div>
-            )}
-            
-            <div className="flex justify-between items-start mb-4">
+      <div className="space-y-lg">
+        {quotes.map((q, i) => (
+          <div key={q.id} className="card card-elevated plan-card">
+            {i === 0 && <div className="plan-card-badge plan-card-badge-green">Best Value</div>}
+            <div className="plan-card-header">
               <div>
-                <h3 className="text-lg">{q.insurer}</h3>
-                <p className="text-xs text-accent font-semibold uppercase">{q.coverType}</p>
+                <div style={{ fontWeight: 700, fontSize: '1.0625rem' }}>{q.insurer}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 600, marginTop: 2 }}>{q.coverType}</div>
               </div>
-              <div className="text-right">
-                <p className="text-2xl font-bold text-primary">₹{q.price.toLocaleString()}</p>
-                <p className="text-[10px] text-muted">IDV: ₹{q.idv.toLocaleString()}</p>
+              <div style={{ textAlign: 'right' }}>
+                <div className="plan-card-price">₹{q.price.toLocaleString()}</div>
+                <div className="plan-card-price-label">per year</div>
               </div>
             </div>
-
-            <div className="flex flex-wrap gap-2 mb-6">
-              {q.addons.map((addon: string) => (
-                <span key={addon} className="text-[10px] bg-slate-100 px-2 py-1 rounded text-slate-600 font-medium">{addon}</span>
-              ))}
+            <div className="detail-row" style={{ paddingTop: 0 }}>
+              <span className="detail-key">IDV</span>
+              <span className="detail-value">₹{q.idv.toLocaleString()}</span>
             </div>
-
-            <button className="btn btn-primary btn-sm" onClick={() => handleSelect(q)}>
-              Select Plan
-            </button>
+            <div className="plan-card-tags">
+              {q.addons.map((a: string) => <span key={a} className="plan-tag">{a}</span>)}
+            </div>
+            <button className="btn btn-primary btn-sm" onClick={() => handleSelect(q)}>Select Plan →</button>
           </div>
         ))}
       </div>

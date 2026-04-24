@@ -1,46 +1,36 @@
 "use client";
 import React from 'react';
 import { useLead } from '@/context/LeadContext';
+import { CheckCircle2, ArrowRight } from 'lucide-react';
 
 export default function SuccessScreen() {
-  const { lead, resetLead } = useLead();
+  const { lead } = useLead();
 
   return (
-    <div className="flex flex-col items-center justify-center py-12 text-center h-full animate-fade-in">
-      <div className="w-20 h-20 bg-success/10 text-success rounded-full flex items-center justify-center mb-6 text-4xl">
-        ✓
+    <div style={{ paddingTop: 40 }}>
+      <div className="text-center">
+        <div className="success-icon"><CheckCircle2 size={36} /></div>
+        <h1 className="page-title">Application submitted!</h1>
+        <p className="page-subtitle" style={{ marginTop: 8, maxWidth: 360, marginLeft: 'auto', marginRight: 'auto' }}>
+          An insurance advisor will contact you shortly with the final policy confirmation and payment link.
+        </p>
       </div>
-      
-      <h1 className="mb-4">Your application is ready</h1>
-      <p className="text-muted mb-8 px-6">
-        An insurance advisor will contact you shortly with the final policy confirmation and payment link.
-      </p>
 
-      <div className="card w-full mb-8 text-left">
-        <h3 className="text-sm uppercase text-muted mb-3">Application Summary</h3>
-        <div className="space-y-2">
-            <div className="flex justify-between">
-                <span className="text-sm text-muted">Lead ID</span>
-                <span className="text-sm font-bold">{lead.id}</span>
-            </div>
-            <div className="flex justify-between">
-                <span className="text-sm text-muted">Vehicle</span>
-                <span className="text-sm font-medium">{lead.vehicleDetails?.make} {lead.vehicleDetails?.model}</span>
-            </div>
-            <div className="flex justify-between">
-                <span className="text-sm text-muted">Selected Insurer</span>
-                <span className="text-sm font-medium">{lead.selectedPlan?.insurer}</span>
-            </div>
-            <div className="flex justify-between">
-                <span className="text-sm text-muted">Policy Premium</span>
-                <span className="text-sm font-bold text-primary">₹{lead.selectedPlan?.price.toLocaleString()}</span>
-            </div>
+      <div className="card card-elevated" style={{ marginTop: 32 }}>
+        <div className="section-label">Application Summary</div>
+        <div className="detail-grid">
+          <div className="detail-row"><span className="detail-key">Lead ID</span><span className="detail-value">{lead.id}</span></div>
+          <div className="detail-row"><span className="detail-key">Vehicle</span><span className="detail-value">{lead.vehicleDetails?.make} {lead.vehicleDetails?.model}</span></div>
+          <div className="detail-row"><span className="detail-key">Insurer</span><span className="detail-value">{lead.selectedPlan?.insurer}</span></div>
+          <div className="detail-row"><span className="detail-key">Premium</span><span className="detail-value" style={{ color: 'var(--primary)', fontWeight: 800 }}>₹{lead.selectedPlan?.price?.toLocaleString()}</span></div>
         </div>
       </div>
 
-      <button className="btn btn-outline" onClick={() => { resetLead(); window.location.reload(); }}>
-        Back to Home
-      </button>
+      <div style={{ marginTop: 24 }}>
+        <button className="btn btn-secondary" onClick={() => window.location.reload()}>
+          <ArrowRight size={14} /> Start New Quote
+        </button>
+      </div>
     </div>
   );
 }
