@@ -45,10 +45,17 @@ export default function Home() {
           <Shield size={22} />
           SecureDrive
         </div>
-        <Link href="/admin" className="admin-link">
-          <Settings size={14} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 4 }} />
-          Admin
-        </Link>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          {step === 0 && (
+            <button className="btn btn-primary btn-sm" onClick={() => { trackEvent('header_cta_clicked'); next(); }} style={{ width: 'auto', padding: '8px 16px' }}>
+              Start Quote
+            </button>
+          )}
+          <Link href="/admin" className="admin-link">
+            <Settings size={14} style={{ display: 'inline', verticalAlign: '-2px', marginRight: 4 }} />
+            Admin
+          </Link>
+        </div>
       </header>
 
       {/* Step Progress Bar */}

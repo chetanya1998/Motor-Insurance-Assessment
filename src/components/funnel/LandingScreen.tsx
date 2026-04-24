@@ -1,26 +1,37 @@
 "use client";
 import React from 'react';
-import { Shield, BarChart3, Lock, Zap, Car, FileText, CreditCard, Clock } from 'lucide-react';
+import { Shield, BarChart3, Lock, Zap, ArrowRight } from 'lucide-react';
 
 export default function LandingScreen({ onStart }: { onStart: () => void }) {
   return (
     <div className="landing-content">
       {/* Hero */}
-      <div className="landing-hero">
+      <div className="landing-hero" style={{ paddingBottom: 60 }}>
         <h1 className="landing-hero-title">
           Get your motor insurance estimate in 60 seconds
         </h1>
         <p className="landing-hero-sub">
           Enter your vehicle number — see your estimated premium instantly. No personal details needed upfront.
         </p>
-        <div className="landing-stats">
+        
+        {/* Primary Hero CTA - Moved up for "Proper" Landing Page feel */}
+        <div style={{ marginTop: 32, maxWidth: 320, marginLeft: 'auto', marginRight: 'auto' }}>
+          <button className="btn btn-primary btn-lg" onClick={onStart}>
+            Start Free Quote <ArrowRight size={18} style={{ marginLeft: 8 }} />
+          </button>
+          <div style={{ marginTop: 12, fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+            Takes less than 60 seconds · No login required
+          </div>
+        </div>
+
+        <div className="landing-stats" style={{ marginTop: 40 }}>
           <div><div className="landing-stat-num">15+</div><div className="landing-stat-label">Insurance Partners</div></div>
           <div><div className="landing-stat-num">2L+</div><div className="landing-stat-label">Quotes Generated</div></div>
           <div><div className="landing-stat-num">4.8★</div><div className="landing-stat-label">Customer Rating</div></div>
         </div>
       </div>
 
-      <div className="landing-body">
+      <div className="landing-body" style={{ paddingTop: 40 }}>
         {/* Trust Grid */}
         <div className="trust-grid">
           <div className="trust-item">
@@ -76,25 +87,13 @@ export default function LandingScreen({ onStart }: { onStart: () => void }) {
         </div>
 
         {/* Insurer Strip */}
-        <div className="insurer-strip">
+        <div className="insurer-strip" style={{ marginBottom: 60 }}>
           <span className="insurer-name">HDFC Ergo</span>
           <span className="insurer-name">ICICI Lombard</span>
           <span className="insurer-name">Tata AIG</span>
           <span className="insurer-name">Bajaj Allianz</span>
           <span className="insurer-name">Digit</span>
           <span className="insurer-name">Acko</span>
-        </div>
-
-        {/* CTA */}
-        <div className="sticky-cta">
-          <div className="sticky-cta-inner">
-            <button className="btn btn-primary" onClick={onStart}>
-              Start Quote →
-            </button>
-            <div style={{ textAlign: 'center', marginTop: 8, fontSize: '0.6875rem', color: 'var(--text-muted)' }}>
-              Takes less than 60 seconds · 100% free · No login required
-            </div>
-          </div>
         </div>
       </div>
     </div>
